@@ -43,26 +43,32 @@ jobs:
         with:
           packages: ''
 
-      - name: Install Android 17 SDK (API 37.0)
+      - name: Install Android 17 SDK (API 37.1 or newer)
         run: |
           set -euo pipefail
-          # The published package identifier includes the minor API version.
-          sdkmanager --channel=3 \
-            "platforms;android-37.0" \
-            "build-tools;37.0.0"
+          # Select the newest published API 37.x platform, since the Compose
+          # 1.13 libraries in this project require API 37.1 or later.
+          sdkmanager --list --channel=3 > sdk-packages.txt
+          cat sdk-packages.txt
+          platform_package="$(grep -oE 'platforms;android-37\\.[0-9]+' sdk-packages.txt | sort -Vu | tail -n 1)"
+          if [[ -z "$platform_package" ]]; then
+            echo "No Android 37.1+ SDK platform package was found." >&2
+            exit 1
+          fi
 
-          # compileSdk = 37 resolves the legacy android-37 directory name.
-          # The SDK package is installed as android-37.0, so expose the
-          # same platform under the name expected by AGP.
-          if [[ -d "$ANDROID_HOME/platforms/android-37.0" && ! -e "$ANDROID_HOME/platforms/android-37" ]]; then
-            ln -s android-37.0 "$ANDROID_HOME/platforms/android-37"
+          sdkmanager --channel=3 "$platform_package" "build-tools;37.0.0"
+
+          # This project's compileSdk is 37; make its expected SDK directory
+          # resolve to the selected 37.x platform metadata.
+          platform_dir="${platform_package#platforms;}"
+          if [[ ! -e "$ANDROID_HOME/platforms/android-37" ]]; then
+            ln -s "$platform_dir" "$ANDROID_HOME/platforms/android-37"
           fi
 
       - name: Verify Java, Gradle and Android SDK
         run: |
           java -version
           gradle --version
-          test -d "$ANDROID_HOME/platforms/android-37.0"
           test -e "$ANDROID_HOME/platforms/android-37"
           test -d "$ANDROID_HOME/build-tools/37.0.0"
 
