@@ -68,7 +68,7 @@ jobs:
 
       - name: Build APK and run verification
         run: |
-          ./gradlew --no-daemon --stacktrace \
+          bash ./gradlew --no-daemon --stacktrace \
             :app:assembleDebug \
             :app:testDebugUnitTest \
             :app:lintDebug \
