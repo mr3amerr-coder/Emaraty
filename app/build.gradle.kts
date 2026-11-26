@@ -12,6 +12,7 @@ plugins {
 android {
     namespace = "com.zero.amaraty"
     compileSdk = 37
+    compileSdkMinor = 2
 
     defaultConfig {
         applicationId = "com.zero.amaraty"
