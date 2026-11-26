@@ -1,0 +1,13 @@
+# Conservative baseline. Rules are tightened after the first Android build.
+build:
+  maxIssues: 0
+
+config:
+  validation: true
+  warningsAsErrors: false
+
+style:
+  MagicNumber:
+    active: false
+  ReturnCount:
+    active: false

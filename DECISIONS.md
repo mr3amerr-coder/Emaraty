@@ -1,0 +1,26 @@
+# Decisions and assumptions
+
+| Decision | Reason | How to change safely |
+|---|---|---|
+| Arabic is the default UI language; English strings are included as an alternate resource set | The primary users are Egyptian residents and union officers | Add a supported locale resource set and test RTL/LTR before changing defaults |
+| Package and initial application ID are `com.zero.amaraty` | A working local namespace was needed for the foundation project | Replace with the publisher's owned reverse-domain identifier before publishing; update namespace, manifest references, tests and generated Room schema together |
+| All stored money is integer piastres in `Long` | Avoid binary rounding and preserve exact financial values | Do not change the storage scale without a versioned migration and full financial regression suite |
+| The parser rejects a single ASCII comma/dot followed by exactly three digits when it could represent either decimal or grouping | Safer to ask for an unambiguous form than misread a payment amount | The UI can add explicit locale-specific entry modes later, retaining the same integer storage invariant |
+| The readable allocation vectors are implemented exactly as supplied: (100000; 1,1,1), (10000; 1,1,2), (1001; 1,1,1) | These can be unambiguously read from the flattened source text | Add the remaining vector only after recovering its exact original columns; do not infer values from the concatenated line |
+| The first schema includes only property, unit and audit-log tables | A small first migration surface is safer than pretending the full domain is ready | Add the ledger, funds, bills, meetings, maintenance and document entities with the relevant milestone and migration tests |
+| Audit DAO has append/read operations only | The first audit-log API should not expose destructive mutation | Keep update/delete out of the production DAO; use a new event to record corrections |
+| `INTERNET` permission is omitted; Android backup is disabled | The v1 privacy boundary is local-only and no cloud sync is in scope | Any later sync/backup request requires a separate privacy/security design review and explicit user-facing consent |
+| App lock uses strong biometric and, on Android 11+, device credential | AndroidX Biometric authenticator combinations have platform-level support limits | Keep the version-aware authenticator selection; retest on API 26, 28, 29, 30 and latest target |
+| Debug StrictMode is logging-only and LeakCanary is debug-only | Surface accidental main-thread work/leaks during development without exposing debug tools in release | Adjust detection only after profiling; do not disable privacy or correctness checks to silence warnings |
+| Detekt uses `2.0.0-alpha.6` rather than stable `1.23.8` | The current Detekt compatibility table lists 1.23.8 against Kotlin 2.0.21, while 2.0.0-alpha.6 is tested against Kotlin 2.4.10 and AGP 9.3.1. The alpha status and patch/minor version gap remain an explicit build risk | Re-evaluate after a stable Detekt 2 release or successful sync against the selected toolchain |
+| Spotless is pinned to 8.12.0 | This is the latest Gradle Plugin Portal release found on 26 November 2026 | Update only after reviewing release notes and formatting output |
+| No bundled Arabic font is included in this archive | The environment does not ship font assets; a correctly licensed OFL font must be sourced and reviewed before bundling | Add a verified OFL-licensed Cairo, Tajawal or Noto Naskh Arabic font with license/attribution and confirm PDF font embedding in the PDF milestone |
+| No encrypted SQLCipher database is configured in M1 | Database encryption would add a dependency and key lifecycle that need a full backup/restore and recovery threat model | Design key generation, Android Keystore wrapping, migration, recovery and restore behavior before adopting encrypted database storage |
+| AGP 9 built-in Kotlin is disabled to pin the standalone Kotlin plugin and KSP | The selected Kotlin compiler is newer than AGP's bundled Kotlin integration | Confirm the selected AGP/Kotlin/KSP combination during the first online Gradle sync; revisit the plugin setup if Gradle reports incompatibility |
+| `gradlew` scripts are local bootstrap shims, not the official wrapper | No Gradle distribution or wrapper JAR was available offline | Generate and commit the official wrapper with Gradle 9.9.2 after installing Gradle |
+| `Africa/Cairo` is the intended business timezone for future date/reminder features | The app is for Egyptian properties | Store instants in UTC and derive local dates using `ZoneId.of("Africa/Cairo")`; never hard-code UTC+02:00 |
+| Quorum, notice, majority and legal thresholds are not defaults in this foundation | These must be configurable and tied to building bylaws, not shown as legal advice | Add editable settings with an explicit "يُراجع النظام الأساسي للعمارة" warning in the meetings milestone |
+
+## Known ambiguity in source data
+
+The fourth allocation golden-test row was flattened into an unreadable string in the provided text extraction. It appears concatenated with the prior row and does not preserve clear total/weight/expected-share columns. It was intentionally not reconstructed or added as a guessed test vector. The first three fully readable vectors are implemented.
