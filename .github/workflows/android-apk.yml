@@ -50,7 +50,7 @@ jobs:
           # 1.13 libraries in this project require API 37.1 or later.
           sdkmanager --list --channel=3 > sdk-packages.txt
           cat sdk-packages.txt
-          platform_package="$(grep -oE 'platforms;android-37\\.[0-9]+' sdk-packages.txt | sort -Vu | tail -n 1)"
+          platform_package="$(grep -oE 'platforms;android-37[.][0-9]+' sdk-packages.txt | sort -Vu | tail -n 1)"
           if [[ -z "$platform_package" ]]; then
             echo "No Android 37.1+ SDK platform package was found." >&2
             exit 1
