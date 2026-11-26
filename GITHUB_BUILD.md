@@ -30,14 +30,14 @@ Artifacts are retained for 14 days. A new push creates a new build.
 
 - JDK 17
 - Gradle 9.9.2
-- Android 17 SDK (API 37)
-- Android SDK Build Tools 36.0.0
+- Android 17 SDK (API 37.1 or newer; the workflow selects the newest available 37.x platform)
+- Android SDK Build Tools 37.0.0
 - `:app:assembleDebug`
 - `:app:testDebugUnitTest`
 - `:app:lintDebug`
 - `:core:domain:test`
 
-The checked-in `gradlew` is a bootstrap shim rather than the official Gradle Wrapper. The workflow installs Gradle 9.9.2 on the runner first, and the shim delegates to that installation.
+The checked-in `gradlew` is a bootstrap shim rather than the official Gradle Wrapper. The workflow installs Gradle 9.9.2 on the runner first, and the shim delegates to that installation. CI disables Gradle's configuration cache because the repository's custom money-domain verification task currently captures a script object that Gradle cannot serialize into that cache.
 
 ## Important limits
 
