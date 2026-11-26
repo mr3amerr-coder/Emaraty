@@ -2,6 +2,8 @@
 
 Arabic-first, offline-first Android project for apartment records, shared-building administration, owners' union finance, and household bills in Egypt.
 
+> **Build APK on GitHub:** follow [GITHUB_BUILD.md](GITHUB_BUILD.md), then download `amaraty-debug-apk` from **Actions → Artifacts** after a successful run.
+
 > **Current delivery: Foundation milestone (M1), not a complete building-management release.** The repository contains a real Android source project, an independently compiled pure-Kotlin money/allocation layer, a first Room schema, local settings, a small Compose shell, and tests. Bills, union ledger, charge runs, meetings, elevator workflows, document vault, encrypted backup, and PDF/CSV exports are not implemented yet.
 
 ## What is implemented now
