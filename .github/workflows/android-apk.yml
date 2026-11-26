@@ -43,33 +43,18 @@ jobs:
         with:
           packages: ''
 
-      - name: Install Android 17 SDK (API 37.1 or newer)
+      - name: Install Android 17 SDK (API 37.2)
         run: |
           set -euo pipefail
-          # Select the newest published API 37.x platform, since the Compose
-          # 1.13 libraries in this project require API 37.1 or later.
-          sdkmanager --list --channel=3 > sdk-packages.txt
-          cat sdk-packages.txt
-          platform_package="$(grep -oE 'platforms;android-37[.][0-9]+' sdk-packages.txt | sort -Vu | tail -n 1)"
-          if [[ -z "$platform_package" ]]; then
-            echo "No Android 37.1+ SDK platform package was found." >&2
-            exit 1
-          fi
-
-          sdkmanager --channel=3 "$platform_package" "build-tools;37.0.0"
-
-          # This project's compileSdk is 37; make its expected SDK directory
-          # resolve to the selected 37.x platform metadata.
-          platform_dir="${platform_package#platforms;}"
-          if [[ ! -e "$ANDROID_HOME/platforms/android-37" ]]; then
-            ln -s "$platform_dir" "$ANDROID_HOME/platforms/android-37"
-          fi
+          sdkmanager --channel=3 \
+            "platforms;android-37.2" \
+            "build-tools;37.0.0"
 
       - name: Verify Java, Gradle and Android SDK
         run: |
           java -version
           gradle --version
-          test -e "$ANDROID_HOME/platforms/android-37"
+          test -d "$ANDROID_HOME/platforms/android-37.2"
           test -d "$ANDROID_HOME/build-tools/37.0.0"
 
       - name: Build APK and run verification
